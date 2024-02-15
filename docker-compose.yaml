@@ -1,8 +1,6 @@
 services:
   kafka1:
     image: bitnami/kafka:latest
-    networks:
-      - kafka-cluster
     ports:
       - '9094:9094'
     environment:
@@ -17,12 +15,10 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092,EXTERNAL://localhost:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
     volumes:
-      - ./kafka/kafka1/kafka:/bitnami/kafka
+      - ./kafka/kafka1:/bitnami/kafka
   #########################################################
 #  kafka2:
-#   image: bitnami/kafka:latest
-#    networks:
-#      - kafka-cluster
+#    image: bitnami/kafka:latest
 #    ports:
 #      - '9095:9095'
 #    environment:
@@ -36,11 +32,9 @@ services:
 #      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka2:9092,EXTERNAL://localhost:9095
 #      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
 #    volumes:
-#      - ./kafka/kafka2/kafka:/bitnami/kafka
+#      - ./kafka/kafka2:/bitnami/kafka
 #  kafka3:
 #    image: bitnami/kafka:latest
-#    networks:
-#      - kafka-cluster
 #    ports:
 #      - '9096:9096'
 #    environment:
@@ -54,7 +48,7 @@ services:
 #      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka3:9092,EXTERNAL://localhost:9096
 #      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
 #    volumes:
-#      - ./kafka/kafka3/kafka:/bitnami/kafka
+#      - ./kafka/kafka3:/bitnami/kafka
 ########################################################
   kafka-ui:
     container_name: kafka-ui
@@ -63,40 +57,46 @@ services:
       - kafka1
       #- kafka2
       #- kafka3
-    networks:
-      - kafka-cluster
     ports:
-      - "8080:8080"
+      - "8181:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092
       #,kafka2:9092,kafka3:9092
 
   mysql:
-    image: mysql:latest
-    #command: --default-authentication-plugin=mysql_native_password
-    networks:
-      - kafka-cluster
+    image: mysql/mysql-server:5.7
+    container_name: mysql
+    volumes:
+      - "./database:/database"
+    command: mysqld --server-id=1234 --log_bin --init-file="/database/schema.sql"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      LOG_BIN: ON
+      LOG_BASENAME: /data/mysql/binlogs
+    ports:
+      - 3306:3306
+      
+  adminer:
+    image: adminer
     restart: always
     ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=12345678
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=12345678
-  
-  debezium:
+       - 8282:8080
+    depends_on:
+       - mysql
+      
+  kafka-mysql-connector-debezium:
     image: debezium/connect:latest
     depends_on:
       #- kafka3
       #- kafka2
       - kafka1
-      - kafka-ui
       - mysql
     ports:
       - "8083:8083"
-    networks:
-      - kafka-cluster
     environment:
       - BOOTSTRAP_SERVERS=kafka1:9092
       #,kafka2:9092,kafka3:9092
@@ -104,16 +104,4 @@ services:
       - CONFIG_STORAGE_TOPIC=my_connect_configs
       - OFFSET_STORAGE_TOPIC=my_connect_offsets
       - STATUS_STORAGE_TOPIC=my_source_connect_statuses
-
-  mysql-workbench:
-    image: lscr.io/linuxserver/mysql-workbench:latest
-    depends_on:
-      - mysql
-    container_name: mysql-workbench
-    ports:
-      - 3000:3000
-      - 3001:3001
-    restart: unless-stopped
-networks:
-  kafka-cluster:
-    driver: bridge
+      
