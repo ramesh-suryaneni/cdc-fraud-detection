@@ -28,9 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Soby Chacko
- */
 public class Producers {
 
 	public static void main(String... args) {

@@ -70,7 +70,7 @@ services:
     container_name: mysql
     volumes:
       - "./database:/database"
-    command: mysqld --server-id=1234 --log_bin --init-file="/database/schema.sql"
+    command: mysqld --server-id=1234 --log_bin="mysql-bin" --init-file="/database/schema.sql"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mydb

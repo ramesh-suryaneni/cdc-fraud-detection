@@ -20,10 +20,9 @@ import java.util.function.BiFunction;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.kstream.GlobalKTable;
 import org.apache.kafka.streams.kstream.Grouped;
-import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -38,18 +37,29 @@ public class Processor1Application {
 	public static class KStreamToTableJoinApplication {
 
 		@Bean
-		public BiFunction<KStream<String, Long>, KTable<String, String>, KStream<String, Long>> process() {
-
-			return (transactionsStream, userProfileTable) -> transactionsStream
-					.leftJoin(userProfileTable,
-							(transactions, profile) -> new RegionWithClicks(profile == null ? "UNKNOWN" : profile, transactions),
-							Joined.with(Serdes.String(), Serdes.Long(), null))
+		public BiFunction<KStream<String, Long>, GlobalKTable<String, String>, KStream<String, Long>> process() {
+			
+			return (userClicksStream, userRegionsTable) -> userClicksStream
+					.leftJoin(userRegionsTable,
+							(name,value) -> name,
+							(clicks, region) -> new RegionWithClicks(region == null ? "UNKNOWN" : region, clicks)
+							)
 					.map((user, regionWithClicks) -> new KeyValue<>(regionWithClicks.getRegion(), regionWithClicks.getClicks()))
 					.groupByKey(Grouped.with(Serdes.String(), Serdes.Long()))
 					.reduce((firstClicks, secondClicks) -> firstClicks + secondClicks)
 					.toStream();
 		}
-	}
+
+//			return (userClicksStream, userRegionsTable) -> (userClicksStream
+//		            .leftJoin(userRegionsTable, (clicks, region) -> new RegionWithClicks(region == null ?
+//		                            "UNKNOWN" : region, clicks),
+//		            		Joined.with(Serdes.String(), Serdes.Long(), null))
+//		            .map((user, regionWithClicks) -> new KeyValue<>(regionWithClicks.getRegion(),
+//		                    regionWithClicks.getClicks()))
+//		            .groupByKey(Grouped.with(Serdes.String(), Serdes.Long()))
+//		            .reduce(Long::sum)
+//		            .toStream());
+		}
 
 	private static final class RegionWithClicks {
 

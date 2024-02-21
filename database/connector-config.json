@@ -12,6 +12,9 @@
 	"table.include.list": "mydb.transactions,mydb.user_profile",
 	"auto.create.topics.enable": "true",
 	"topic.prefix": "mysql",
+	"key.converter": "org.apache.kafka.connect.json.JsonConverter",
+	"value.converter": "org.apache.kafka.connect.json.JsonConverter",
+	"key.converter.schemas.enable": "false",
 	"value.converter.schemas.enable": "false",
     "schema.history.internal.kafka.bootstrap.servers": "kafka1:9092",  
     "schema.history.internal.kafka.topic": "schema-changes.mydb"  
