@@ -16,17 +16,19 @@
 
 package com.example.demo;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.LongSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KeyValue;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Producers {
 
@@ -39,48 +41,51 @@ public class Producers {
 		props.put(ProducerConfig.LINGER_MS_CONFIG, 1);
 		props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
-
-		List<KeyValue<String, Long>> userClicks = Arrays.asList(
-				new KeyValue<>("alice", 13L),
-				new KeyValue<>("bob", 4L),
-				new KeyValue<>("chao", 25L),
-				new KeyValue<>("bob", 19L),
-				new KeyValue<>("dave", 56L),
-				new KeyValue<>("eve", 78L),
-				new KeyValue<>("alice", 40L),
-				new KeyValue<>("fang", 99L)
-		);
-
-		DefaultKafkaProducerFactory<String, Long> pf = new DefaultKafkaProducerFactory<>(props);
-		KafkaTemplate<String, Long> template = new KafkaTemplate<>(pf, true);
-		template.setDefaultTopic("mysql.mydb.transactions");
-
-		for (KeyValue<String,Long> keyValue : userClicks) {
-			template.sendDefault(keyValue.key, keyValue.value);
-		}
-
-		List<KeyValue<String, String>> userRegions = Arrays.asList(
-				new KeyValue<>("alice", "asia"),   /* Alice lived in Asia originally... */
-				new KeyValue<>("bob", "americas"),
-				new KeyValue<>("chao", "asia"),
-				new KeyValue<>("dave", "europe"),
-				new KeyValue<>("alice", "europe"), /* ...but moved to Europe some time later. */
-				new KeyValue<>("eve", "americas"),
-				new KeyValue<>("fang", "asia")
-		);
-
-		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		String json1 = "", json2 = "", json3 = "", json4 = "";
+		try {
+			json1 = mapper.writeValueAsString(new UserProfile("100", "name", "surname", "middle_name", null));
+			json2 = mapper.writeValueAsString(new UserProfile("101", "name1", "surname1", "middle_name1", null));
+			
+			json3 = mapper.writeValueAsString(new Transaction("1", "100", "5", "currency", "type", "country",null));
+			json4 = mapper.writeValueAsString(new Transaction("2", "100", "10", "currency", "type", "country",null));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/* insert user profile to Table - run this block first */ 		
 
+		List<KeyValue<String, String>> users = Arrays.asList(
+				new KeyValue<>("100", json1),
+				new KeyValue<>("101", json2)
+		);
+		
+		DefaultKafkaProducerFactory<String, String> pf0 = new DefaultKafkaProducerFactory<>(props);
+		KafkaTemplate<String, String> template0 = new KafkaTemplate<>(pf0, true);
+		template0.setDefaultTopic("mysql.mydb.user_profile");
+		
+		for (KeyValue<String,String> keyValue : users) {
+			template0.sendDefault(keyValue.key, keyValue.value);
+		}
+		
+		/* insert transactions to stream - run this block second by commenting out above user profile */
+		List<KeyValue<String, String>> transactions = Arrays.asList(
+			
+				new KeyValue<>("user-id", json3),
+				new KeyValue<>("user-id", json4)
+		);
+		
 		DefaultKafkaProducerFactory<String, String> pf1 = new DefaultKafkaProducerFactory<>(props);
 		KafkaTemplate<String, String> template1 = new KafkaTemplate<>(pf1, true);
-		template1.setDefaultTopic("mysql.mydb.user_profile");
+		template1.setDefaultTopic("mysql.mydb.transactions");
 
-		for (KeyValue<String,String> keyValue : userRegions) {
+		for (KeyValue<String,String> keyValue : transactions) {
 			template1.sendDefault(keyValue.key, keyValue.value);
 		}
-
+				
 	}
 
 }

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
 );
 CREATE TABLE IF NOT EXISTS transactions (
   id INT NOT NULL AUTO_INCREMENT,
-  user_id VARCHAR(255),
+  user_id INT,
   amount VARCHAR(255),
   currency VARCHAR(255),
   type VARCHAR(255),

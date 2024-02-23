@@ -36,53 +36,46 @@ public class Processor1Application {
 
 	public static class KStreamToTableJoinApplication {
 
+		
 		@Bean
-		public BiFunction<KStream<String, Long>, GlobalKTable<String, String>, KStream<String, Long>> process() {
+		public BiFunction<KStream<String, String>, GlobalKTable<String, String>, KStream<String, String>> process() {
 			
-			return (userClicksStream, userRegionsTable) -> userClicksStream
-					.leftJoin(userRegionsTable,
+			return (userTransactionsStream, allUsersTable) -> userTransactionsStream
+					.leftJoin(allUsersTable,
 							(name,value) -> name,
-							(clicks, region) -> new RegionWithClicks(region == null ? "UNKNOWN" : region, clicks)
+							(transactions, user) -> new UserWithTransactions(user == null ? "UNKNOWN" : user, transactions)
 							)
-					.map((user, regionWithClicks) -> new KeyValue<>(regionWithClicks.getRegion(), regionWithClicks.getClicks()))
-					.groupByKey(Grouped.with(Serdes.String(), Serdes.Long()))
-					.reduce((firstClicks, secondClicks) -> firstClicks + secondClicks)
+					.map((user, userWithTransactions) -> new KeyValue<>(userWithTransactions.getUser(), userWithTransactions.getTransactions()))
+					.groupByKey(Grouped.with(Serdes.String(), Serdes.String()))
+					.reduce((firstTransactions, secondTransactions) -> firstTransactions + secondTransactions)
 					.toStream();
 		}
 
-//			return (userClicksStream, userRegionsTable) -> (userClicksStream
-//		            .leftJoin(userRegionsTable, (clicks, region) -> new RegionWithClicks(region == null ?
-//		                            "UNKNOWN" : region, clicks),
-//		            		Joined.with(Serdes.String(), Serdes.Long(), null))
-//		            .map((user, regionWithClicks) -> new KeyValue<>(regionWithClicks.getRegion(),
-//		                    regionWithClicks.getClicks()))
-//		            .groupByKey(Grouped.with(Serdes.String(), Serdes.Long()))
-//		            .reduce(Long::sum)
-//		            .toStream());
+
 		}
 
-	private static final class RegionWithClicks {
+	private static final class UserWithTransactions {
 
-		private final String region;
-		private final long clicks;
+		private final String user;
+		private final String transactions;
 
-		public RegionWithClicks(String region, long clicks) {
-			if (region == null || region.isEmpty()) {
-				throw new IllegalArgumentException("region must be set");
+		public UserWithTransactions(String user, String transactions) {
+			if (user == null || user.isEmpty()) {
+				throw new IllegalArgumentException("user must be set");
 			}
-			if (clicks < 0) {
-				throw new IllegalArgumentException("clicks must not be negative");
+			if (transactions== null || transactions.isEmpty()) {
+				throw new IllegalArgumentException("Transactions must not be negative");
 			}
-			this.region = region;
-			this.clicks = clicks;
+			this.user = user;
+			this.transactions = transactions;
 		}
 
-		public String getRegion() {
-			return region;
+		public String getUser() {
+			return user;
 		}
 
-		public long getClicks() {
-			return clicks;
+		public String getTransactions() {
+			return transactions;
 		}
 
 	}
