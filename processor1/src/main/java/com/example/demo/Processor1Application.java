@@ -18,11 +18,8 @@ package com.example.demo;
 
 import java.util.function.BiFunction;
 
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.kstream.GlobalKTable;
-import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -35,48 +32,174 @@ public class Processor1Application {
 	}
 
 	public static class KStreamToTableJoinApplication {
-
 		
+				
 		@Bean
-		public BiFunction<KStream<String, String>, GlobalKTable<String, String>, KStream<String, String>> process() {
-			
-			return (userTransactionsStream, allUsersTable) -> userTransactionsStream
-					.leftJoin(allUsersTable,
-							(name,value) -> name,
-							(transactions, user) -> new UserWithTransactions(user == null ? "UNKNOWN" : user, transactions)
-							)
-					.map((user, userWithTransactions) -> new KeyValue<>(userWithTransactions.getUser(), userWithTransactions.getTransactions()))
-					.groupByKey(Grouped.with(Serdes.String(), Serdes.String()))
-					.reduce((firstTransactions, secondTransactions) -> firstTransactions + secondTransactions)
-					.toStream();
-		}
-
-
-		}
-
-	private static final class UserWithTransactions {
-
-		private final String user;
-		private final String transactions;
-
-		public UserWithTransactions(String user, String transactions) {
-			if (user == null || user.isEmpty()) {
-				throw new IllegalArgumentException("user must be set");
-			}
-			if (transactions== null || transactions.isEmpty()) {
-				throw new IllegalArgumentException("Transactions must not be negative");
-			}
-			this.user = user;
-			this.transactions = transactions;
-		}
-
-		public String getUser() {
-			return user;
-		}
-
-		public String getTransactions() {
-			return transactions;
+		public BiFunction<KStream<String, String>, KTable<String, String>, KStream<String, UserWithTransaction>> process() {
+		    return (transactionStream, userProfileTable) -> transactionStream
+		        // Left join based on user ID (assuming both have String keys)
+		        .leftJoin(userProfileTable, (transaction, userProfile) -> new UserWithTransaction(userProfile, transaction));
 		}
 
 	}
+
+	private static final class UserWithTransaction {
+
+		private final String userProfile;
+		private final String transaction;
+		
+		public String getUserProfile() {
+			return userProfile;
+		}
+		public String getTransaction() {
+			return transaction;
+		}
+		public UserWithTransaction(String userProfile, String transaction) {
+			this.userProfile = userProfile;
+			this.transaction = transaction;
+		}
+
+		
+
+	}
+	class Transaction {
+		
+		private String id;
+		private String userId;  
+		private String amount;
+		private String currency;
+		private String type;
+		private String country;
+		private String timestamp;
+			
+		public Transaction(String id, String userId, String amount, String currency, String type, String country,
+				String timestamp) {
+			super();
+			this.id = id;
+			this.userId = userId;
+			this.amount = amount;
+			this.currency = currency;
+			this.type = type;
+			this.country = country;
+			this.timestamp = timestamp;
+		}
+		public String getId() {
+			return id;
+		}
+		public void setId(String id) {
+			this.id = id;
+		}
+		public String getUserId() {
+			return userId;
+		}
+		public void setUserId(String userId) {
+			this.userId = userId;
+		}
+		public String getAmount() {
+			return amount;
+		}
+		public void setAmount(String amount) {
+			this.amount = amount;
+		}
+		public String getCurrency() {
+			return currency;
+		}
+		public void setCurrency(String currency) {
+			this.currency = currency;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public String getCountry() {
+			return country;
+		}
+		public void setCountry(String country) {
+			this.country = country;
+		}
+		public String getTimestamp() {
+			return timestamp;
+		}
+		public void setTimestamp(String timestamp) {
+			this.timestamp = timestamp;
+		}
+		
+
+	}
+	
+	class UserProfile {
+		
+		private String userId;
+		private String name;
+		private String surname;
+		private String middleName;
+		private String suspiciousActivity;
+		
+		
+		public UserProfile(String userId, String name, String surname, String middleName, String suspiciousActivity) {
+			super();
+			this.userId = userId;
+			this.name = name;
+			this.surname = surname;
+			this.middleName = middleName;
+			this.suspiciousActivity = suspiciousActivity;
+		}
+
+
+		public String getUserId() {
+			return userId;
+		}
+
+
+		public void setUserId(String userId) {
+			this.userId = userId;
+		}
+
+
+		public String getName() {
+			return name;
+		}
+
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+
+		public String getSurname() {
+			return surname;
+		}
+
+
+		public void setSurname(String surname) {
+			this.surname = surname;
+		}
+
+
+		public String getMiddleName() {
+			return middleName;
+		}
+
+
+		public void setMiddleName(String middleName) {
+			this.middleName = middleName;
+		}
+
+
+		public String getSuspiciousActivity() {
+			return suspiciousActivity;
+		}
+
+
+		public void setSuspiciousActivity(String suspiciousActivity) {
+			this.suspiciousActivity = suspiciousActivity;
+		}
+		
+		
+	}
+	    
+	    
+	    
 }

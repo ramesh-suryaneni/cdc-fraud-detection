@@ -74,8 +74,8 @@ public class Producers {
 		/* insert transactions to stream - run this block second by commenting out above user profile */
 		List<KeyValue<String, String>> transactions = Arrays.asList(
 			
-				new KeyValue<>("user-id", json3),
-				new KeyValue<>("user-id", json4)
+				new KeyValue<>("100", json3),
+				new KeyValue<>("100", json4)
 		);
 		
 		DefaultKafkaProducerFactory<String, String> pf1 = new DefaultKafkaProducerFactory<>(props);

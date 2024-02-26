@@ -3,18 +3,18 @@ package com.example.demo;
 public class Transaction {
 	
 	private String id;
-	private String user_id;  
+	private String userId;  
 	private String amount;
 	private String currency;
 	private String type;
 	private String country;
 	private String timestamp;
 		
-	public Transaction(String id, String user_id, String amount, String currency, String type, String country,
+	public Transaction(String id, String userId, String amount, String currency, String type, String country,
 			String timestamp) {
 		super();
 		this.id = id;
-		this.user_id = user_id;
+		this.userId = userId;
 		this.amount = amount;
 		this.currency = currency;
 		this.type = type;
@@ -27,11 +27,11 @@ public class Transaction {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getUser_id() {
-		return user_id;
+	public String getUserId() {
+		return userId;
 	}
-	public void setUser_id(String user_id) {
-		this.user_id = user_id;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	public String getAmount() {
 		return amount;
