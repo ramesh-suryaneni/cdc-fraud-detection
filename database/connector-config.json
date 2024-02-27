@@ -9,7 +9,7 @@
     "database.password": "pass",
     "database.server.id": "1234",  
     "database.include.list": "mydb",
-	"table.include.list": "mydb.transactions,mydb.user_profile",
+	"table.include.list": "mydb.transactions,mydb.user",
 	"auto.create.topics.enable": "true",
 	"topic.prefix": "mysql",
 	"message.key.columns": "mydb.transactions:user_id",

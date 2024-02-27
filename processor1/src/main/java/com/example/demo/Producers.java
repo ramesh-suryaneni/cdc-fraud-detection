@@ -26,6 +26,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.streams.KeyValue;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,48 +42,44 @@ public class Producers {
 		props.put(ProducerConfig.LINGER_MS_CONFIG, 1);
 		props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 33554432);
 		props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 		
-		ObjectMapper mapper = new ObjectMapper();
-		String json1 = "", json2 = "", json3 = "", json4 = "";
-		try {
-			json1 = mapper.writeValueAsString(new UserProfile("100", "name", "surname", "middle_name", null));
-			json2 = mapper.writeValueAsString(new UserProfile("101", "name1", "surname1", "middle_name1", null));
-			
-			json3 = mapper.writeValueAsString(new Transaction("1", "100", "5", "currency", "type", "country",null));
-			json4 = mapper.writeValueAsString(new Transaction("2", "100", "10", "currency", "type", "country",null));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		User json1,json2;
+		Transaction json3,json4;
+		json1 = new User("100", "name", null);
+		json2 = new User("101", "name1", null);
+		
+		json3 = new Transaction("1", "100", "5", "Txtype", "location",null);
+		json4 = new Transaction("2", "100", "10", "Txtype", "location",null);
+		
 		
 		/* insert user profile to Table - run this block first */ 		
 
-		List<KeyValue<String, String>> users = Arrays.asList(
+		List<KeyValue<String, User>> users = Arrays.asList(
 				new KeyValue<>("100", json1),
 				new KeyValue<>("101", json2)
 		);
 		
-		DefaultKafkaProducerFactory<String, String> pf0 = new DefaultKafkaProducerFactory<>(props);
-		KafkaTemplate<String, String> template0 = new KafkaTemplate<>(pf0, true);
-		template0.setDefaultTopic("mysql.mydb.user_profile");
+		DefaultKafkaProducerFactory<String, User> pf0 = new DefaultKafkaProducerFactory<>(props);
+		KafkaTemplate<String, User> template0 = new KafkaTemplate<>(pf0, true);
+		template0.setDefaultTopic("mysql.mydb.user");
 		
-		for (KeyValue<String,String> keyValue : users) {
+		for (KeyValue<String,User> keyValue : users) {
 			template0.sendDefault(keyValue.key, keyValue.value);
 		}
 		
 		/* insert transactions to stream - run this block second by commenting out above user profile */
-		List<KeyValue<String, String>> transactions = Arrays.asList(
+		List<KeyValue<String, Transaction>> transactions = Arrays.asList(
 			
 				new KeyValue<>("100", json3),
 				new KeyValue<>("100", json4)
 		);
 		
-		DefaultKafkaProducerFactory<String, String> pf1 = new DefaultKafkaProducerFactory<>(props);
-		KafkaTemplate<String, String> template1 = new KafkaTemplate<>(pf1, true);
+		DefaultKafkaProducerFactory<String, Transaction> pf1 = new DefaultKafkaProducerFactory<>(props);
+		KafkaTemplate<String, Transaction> template1 = new KafkaTemplate<>(pf1, true);
 		template1.setDefaultTopic("mysql.mydb.transactions");
 
-		for (KeyValue<String,String> keyValue : transactions) {
+		for (KeyValue<String,Transaction> keyValue : transactions) {
 			template1.sendDefault(keyValue.key, keyValue.value);
 		}
 				
