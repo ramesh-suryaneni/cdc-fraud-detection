@@ -46,24 +46,7 @@ public class Processor1Application {
 
 	}
 	
-	private static final class JoinRecord {
-		private final String user;
-		private final String transaction;
-		public JoinRecord(String user, String transaction) {
-			super();
-			this.user = user;
-			this.transaction = transaction;
-		}
-		public String getUser() {
-			return user;
-		}
-		public String getTransaction() {
-			return transaction;
-		}
-		
-		
-	}
-
+	
 	private static final class UserWithTransaction {
 
 		private final String userId;

@@ -1,4 +1,4 @@
-spring.application.name: stream-global-table-sample
+spring.application.name: processor1
 spring.cloud.stream.kafka.binder.brokers: localhost:9094
 spring.cloud.stream.bindings.process-in-0:
   destination: mysql.mydb.transactions
