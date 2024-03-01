@@ -7,8 +7,6 @@ spring.cloud.stream.bindings.process-in-0:
       value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 spring.cloud.stream.bindings.process-out-0:
   destination: output-topic
-  producer:
-      value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 spring.cloud.stream.kafka.streams.binder:
   configuration:
     default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde

@@ -25,7 +25,9 @@ public class Processor2Application {
 	@Bean
 	public Function<KStream<String, MyData>, KStream<String, Long>> process() {
 		return sourceStream -> {
+			// Step 1: Group by key and save state in memory
 			KGroupedStream<String, MyData> groupedStream = sourceStream.groupByKey();
+			// Step 2: Apply 1-hour sliding window and aggregate sum
 			KTable<Windowed<String>, Long> windowedAggregation = groupedStream
 					.windowedBy(TimeWindows.of(Duration.ofHours(1)))
 					.aggregate(
