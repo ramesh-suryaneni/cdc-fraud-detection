@@ -13,11 +13,12 @@ basically 3 transactions within 1 hr in different locations not possible, some f
 
 ## pre-requites
 * Docker installed
+* clone this repo to local
 
-### Testing in local
+### How to?
 run docker containers
-`docker  compose up -d `
-wait for all conatiners to running state(5 min)
+```docker  compose up -d```
+wait for all conatiners to running state(5 min, initial db schama created)
 * kafka1 - apache kafka container as streaming engine(we can run as cluster also)
 * kafka-ui - for testing kafka brokers, topics etc(http://localhost:8181)
 * db - mysql database
