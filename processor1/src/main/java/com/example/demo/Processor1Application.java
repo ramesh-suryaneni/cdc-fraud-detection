@@ -50,25 +50,53 @@ public class Processor1Application {
 	private static final class UserWithTransaction {
 
 		private final String userId;
-		private final User user;
-		private final Transaction transaction;
+		private final String name;
+		
+		private final String transactionId;
+		private final String amount;
+		private final String transactionType;
+		private final String location;
+		private final String timestamp;
+		  
 		public UserWithTransaction(String userId, User user, Transaction transaction) {
 			super();
 			this.userId = userId;
-			this.user = user;
-			this.transaction = transaction;
+			this.name = user.getName();
+			
+			this.transactionId = transaction.getId();
+			this.amount = transaction.getAmount();
+			this.transactionType = transaction.getTxType();
+			this.location = transaction.getLocation();
+			this.timestamp = transaction.getTimestamp();
 		}
+
 		public String getUserId() {
 			return userId;
 		}
-		public User getUser() {
-			return user;
+
+		public String getName() {
+			return name;
 		}
-		public Transaction getTransaction() {
-			return transaction;
+
+		public String getTransactionId() {
+			return transactionId;
 		}
-		
-		
+
+		public String getAmount() {
+			return amount;
+		}
+
+		public String getTransactionType() {
+			return transactionType;
+		}
+
+		public String getLocation() {
+			return location;
+		}
+
+		public String getTimestamp() {
+			return timestamp;
+		}
 	}
 	
 }
