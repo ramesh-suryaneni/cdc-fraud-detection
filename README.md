@@ -9,7 +9,7 @@ assume 3 transactions happened in less duration
 2. transaction2: user used credit card for 300000 in Banglore
 3. transaction3: user used credit card for 40000 in Delhi
 
-basically 3 transactions within 1 hr in different locations not possible, some fraud is happening and we need to alert user and block his account further transactions not to happen.
+basically 3 transactions within 1 hr in different locations not possible, some fraud is happening and we need to alert user and block his account for further transactions not to happen.
 
 ## pre-requites
 * Docker installed
