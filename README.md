@@ -2,7 +2,7 @@
 
 Imagine a financial services company that processes transactions. Each transaction needs to be analyzed for fraud detection in real-time.
 
-read more here for more  https://medium.com/@ramesh.suryaneni/real-time-insights-unlock-the-power-of-change-data-capture-b0a64459a8f5
+read here for more  https://medium.com/@ramesh.suryaneni/real-time-insights-unlock-the-power-of-change-data-capture-b0a64459a8f5
 
 ## scenario
 
