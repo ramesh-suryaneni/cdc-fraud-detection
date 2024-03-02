@@ -2,6 +2,8 @@
 
 Imagine a financial services company that processes transactions. Each transaction needs to be analyzed for fraud detection in real-time.
 
+read more here for more  https://medium.com/@ramesh.suryaneni/real-time-insights-unlock-the-power-of-change-data-capture-b0a64459a8f5
+
 ## scenario
 
 assume 3 transactions happened in less duration
@@ -11,12 +13,14 @@ assume 3 transactions happened in less duration
 
 basically 3 transactions within 1 hr in different locations not possible, some fraud is happening and we need to alert user and block his account for further transactions not to happen.
 
-## pre-requites
+## How to test this app?
+
+### pre-requites
 * Docker installed
 * clone this repo to local
 
-### How to?
-run docker containers
+### run docker containers
+
 ```docker  compose up -d```
 wait for all conatiners to running state(5 min, initial db schama created)
 * kafka1 - apache kafka container as streaming engine(we can run as cluster also)
@@ -49,7 +53,7 @@ DELETE http://localhost:8083/connectors/replace-your-connector-name
 
 #### note: both java projects should be running to see results, verify kafka topics using kafka-ui
 
-## test data
+### test data
 use DB client to insert below records
 
 ```
@@ -64,6 +68,9 @@ INSERT INTO transactions(user_id, amount, tx_type, location) VALUES ("101", "100
 INSERT INTO transactions(user_id, amount, tx_type, location) VALUES ("101", "20000", "2", "Delhi");
 INSERT INTO transactions(user_id, amount, tx_type, location) VALUES ("101", "30000", "2", "Bangalore");
 ```
+#### note: 
+* wait some time as we have 1hr winowdow to see end result
+* we can test spring boot projects individually using their own docker-composer.yaml and producer.java classes
 
-
-
+#### improvement idea
+manual activity and dockerizing spring boot apps.
