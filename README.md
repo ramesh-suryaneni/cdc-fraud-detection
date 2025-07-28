@@ -6,7 +6,7 @@ read here for more  https://medium.com/@ramesh.suryaneni/real-time-insights-unlo
 
 ## scenario
 
-assume 3 transactions happened in less duration
+assume 3 transactions happened in short time span
 1. transaction1: user used credit card for 20000 in Hyderabad
 2. transaction2: user used credit card for 300000 in Banglore
 3. transaction3: user used credit card for 40000 in Delhi
